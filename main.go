@@ -44,7 +44,8 @@ func draw(w http.ResponseWriter, r *http.Request) {
 	canvas.Text(0, height-5, "發佈時間： "+t, "font-size:15px;font-family:微軟正黑體")
 	canvas.End()
 
-	fmt.Println("最新創作: ", n)
-	fmt.Println("發佈時間: ", t)
+	fmt.Println("巴哈ID: " + baha_id)
+	fmt.Println("最新創作: " + n)
+	fmt.Println("發佈時間: " + t)
 
 }
