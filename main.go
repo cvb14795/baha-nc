@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	svg "github.com/ajstarks/svgo"
 	"github.com/gorilla/mux"
@@ -17,35 +18,38 @@ func main() {
 	}
 	r := mux.NewRouter()
 	r.Path("/get").
-		//接收?後參數
-		Queries("baha_id", "{baha_id}").
+		Queries("baha_id", "{baha_id}", "count", "{count}").
 		HandlerFunc(draw)
-
 	http.ListenAndServe(":"+port, r)
 }
 
 func draw(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 	vars := mux.Vars(r)
-	// 預設為自己ID
-	baha_id := "cvb14795"
-	if len(vars) > 0 {
-		baha_id = vars["baha_id"]
+	// 要抓幾筆資料
+	count, err := strconv.Atoi(vars["count"])
+	if err != nil {
+		fmt.Println(err)
 	}
-
 	// 爬巴哈創作
-	n, t := scrape.Run(baha_id)
-
+	n := scrape.Run(vars["baha_id"], count)
 	width := 800
-	height := 50
+	const LINE_SPACE = 30
+	y := 0
 	canvas := svg.New(w)
-	canvas.Start(width, height)
-	canvas.Text(0, height/2, "最新創作： "+n, "font-size:15px;font-family:微軟正黑體")
-	canvas.Text(0, height-5, "發佈時間： "+t, "font-size:15px;font-family:微軟正黑體")
+	canvas.Start(width, LINE_SPACE*len(n))
+	for i, elem := range n {
+		if i == len(n)-1 { // 最後一行預留3px避免文字被切掉
+			y += LINE_SPACE - 3
+		} else {
+			y += LINE_SPACE
+		}
+		canvas.Text(0, y, elem, "font-size:15px;font-family:微軟正黑體")
+	}
 	canvas.End()
 
-	fmt.Println("巴哈ID: " + baha_id)
-	fmt.Println("最新創作: " + n)
-	fmt.Println("發佈時間: " + t)
-
+	fmt.Println("巴哈ID: " + vars["baha_id"])
+	for i, elem := range n {
+		fmt.Println("創作標題" + strconv.Itoa(i) + ": " + elem)
+	}
 }
