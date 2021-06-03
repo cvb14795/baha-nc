@@ -1,7 +1,6 @@
 package scrape
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -30,10 +29,6 @@ func Run(baha_id string, count int) []string {
 			// 取出字串的時間部份 轉time格式
 			t_f, _ := time.Parse(TIME_LAYOUT, tmp[1])
 			t = append(t, t_f)
-			// 列出該時間
-			/* fmt.Printf("%d-%02d-%02d %02d:%02d:%02d\n",
-			t_f.Year(), t_f.Month(), t_f.Day(),
-			t_f.Hour(), t_f.Minute(), t_f.Second()) */
 		}
 	})
 
@@ -50,7 +45,6 @@ func Run(baha_id string, count int) []string {
 
 	for i, elem := range t {
 		result = append(result, Result{Time: elem, Name: n[i]})
-		fmt.Println(result[i])
 	}
 	sort.Slice(result, func(i, j int) bool {
 		//由時間新到舊排序
@@ -61,7 +55,6 @@ func Run(baha_id string, count int) []string {
 			break
 		}
 		n_sort = append(n_sort, elem.Name)
-		fmt.Println(elem.Name)
 	}
 	return n_sort
 }
